@@ -1,0 +1,818 @@
+<title>Ohris Concepts &mdash; Building intelligent software for everyday life</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  /* ============================================================
+     OHRIS CONCEPTS &mdash; "Studio" landing (Direction A, final)
+     Porcelain ground &middot; dark panels &middot; violet #6E56F7
+     ============================================================ */
+
+  :root{
+    --bg:#F3F1F4;
+    --ink:#141019;
+    --body:#3E3849;
+    --muted:#6B6478;
+    --line:#E4E1E8;
+    --card:#FFFFFF;
+    --violet:#6E56F7;
+    --violet-2:#9C8BFF;
+    --violet-deep:#5138C9;
+    --tint:#F1EFF6;
+    --tint-2:#EEEAFE;
+    --tint-faint:#FBFAFE;
+    --mint:#C9F0E6;
+    --panel:#0E0B14;
+    --font-sans:-apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, Roboto, Helvetica, Arial, sans-serif;
+    --font-mono:ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
+    --r-panel:34px;
+    --r-card:22px;
+    --r-nested:20px;
+  }
+
+  *{ box-sizing:border-box; }
+  html{ scroll-behavior:smooth; }
+  @media (prefers-reduced-motion:reduce){ html{ scroll-behavior:auto; } }
+  html, body{ margin:0; padding:0; }
+  body{
+    background:var(--bg); color:var(--ink);
+    font-family:var(--font-sans);
+    -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
+    overflow-x:hidden;
+  }
+  a{ color:inherit; text-decoration:none; }
+  img, svg{ max-width:100%; }
+  ::selection{ background:var(--violet); color:#fff; }
+  :focus-visible{ outline:2px solid var(--violet); outline-offset:3px; border-radius:6px; }
+
+  .wrap{ width:min(1180px, 92vw); margin-inline:auto; }
+  section{ scroll-margin-top:96px; }
+
+  .skip{
+    position:absolute; left:-9999px; top:0; z-index:100;
+    background:var(--ink); color:#fff; padding:10px 18px; border-radius:0 0 12px 0; font-size:14px;
+  }
+  .skip:focus{ left:0; }
+
+  /* ---------- shared type ---------- */
+  .kicker{
+    display:inline-flex; align-items:center; gap:8px;
+    font-size:13px; font-weight:600; letter-spacing:.14em; text-transform:uppercase;
+    color:var(--violet); background:var(--card); border:1px solid var(--line);
+    border-radius:999px; padding:8px 16px;
+  }
+  h2.sec-title{
+    font-size:clamp(30px, 4vw, 48px); line-height:1.06; letter-spacing:-.03em;
+    font-weight:800; margin:24px 0 0; text-wrap:balance;
+  }
+  h2.sec-title em{ font-style:normal; color:var(--violet); }
+  .sec-lead{ color:var(--muted); font-size:17px; line-height:1.6; max-width:56ch; margin:16px 0 0; }
+
+  /* ---------- reveal on scroll (JS-gated so no-JS still shows all) ---------- */
+  html.js .rev{ opacity:0; transform:translateY(18px); transition:opacity .7s ease, transform .7s cubic-bezier(.2,.8,.2,1); }
+  html.js .rev.in{ opacity:1; transform:none; }
+  @media (prefers-reduced-motion:reduce){
+    html.js .rev{ opacity:1; transform:none; transition:none; }
+  }
+
+  /* =========================================================
+     NAV
+     ========================================================= */
+  .nav{
+    position:sticky; top:16px; z-index:40;
+    width:min(760px, 92vw); margin:20px auto 0;
+    display:flex; align-items:center; gap:8px;
+    background:rgba(16,11,20,.92);
+    backdrop-filter:blur(14px);
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:999px;
+    padding:8px 8px 8px 14px;
+    box-shadow:0 18px 50px -22px rgba(16,11,20,.6);
+  }
+  .brand{ display:flex; align-items:center; gap:10px; color:#fff; padding-right:6px; }
+  .brand b{ font-weight:700; font-size:15px; letter-spacing:-.01em; white-space:nowrap; }
+  .navlinks{ display:flex; gap:4px; margin-left:auto; }
+  .navlinks a{
+    color:rgba(255,255,255,.72); font-size:13.5px; font-weight:500; white-space:nowrap;
+    padding:9px 13px; border-radius:999px; transition:color .18s, background .18s;
+  }
+  .navlinks a:hover{ color:#fff; background:rgba(255,255,255,.08); }
+  .navcta{
+    background:#fff; color:var(--ink); font-size:13.5px; font-weight:650;
+    padding:10px 18px; border-radius:999px; white-space:nowrap; transition:transform .18s, box-shadow .18s;
+  }
+  .navcta:hover{ transform:translateY(-1px); box-shadow:0 8px 22px -8px rgba(255,255,255,.5); }
+
+  /* =========================================================
+     HERO
+     ========================================================= */
+  .hero{
+    position:relative; margin-top:22px;
+    background:var(--panel); border-radius:var(--r-panel); color:#fff;
+    padding:64px 56px 72px; overflow:hidden; isolation:isolate;
+  }
+  .hero::before{
+    content:""; position:absolute; inset:0; z-index:-1;
+    background:
+      radial-gradient(120% 90% at 100% 0%, rgba(110,86,247,.28), transparent 55%),
+      radial-gradient(90% 80% at 0% 100%, rgba(76,125,255,.14), transparent 60%);
+  }
+  .herogrid{ display:grid; grid-template-columns:1.05fr .95fr; align-items:center; gap:24px; }
+  .dots{ display:flex; gap:9px; margin-bottom:26px; }
+  .dots i{ width:9px; height:9px; border-radius:50%; display:block; }
+  .dots i:nth-child(1){ background:#E8A87C; } .dots i:nth-child(2){ background:#F2D06B; }
+  .dots i:nth-child(3){ background:#5BD6A6; } .dots i:nth-child(4){ background:#6E9BFF; }
+  .dots i:nth-child(5){ background:#9C8BFF; }
+  .hero h1{
+    font-size:clamp(38px, 5.4vw, 66px); line-height:1.02; letter-spacing:-.03em;
+    font-weight:800; margin:0 0 22px; text-wrap:balance;
+  }
+  .hero h1 em{
+    font-style:normal;
+    background:linear-gradient(100deg, var(--mint), var(--violet-2) 55%, var(--violet));
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+  }
+  .hero .sub{ font-size:18px; line-height:1.55; color:rgba(255,255,255,.66); max-width:34ch; margin:0 0 34px; }
+  .hero-actions{ display:flex; align-items:center; gap:22px; flex-wrap:wrap; }
+  .cta-pill{
+    display:inline-flex; align-items:center; gap:14px;
+    background:#fff; color:var(--ink); font-weight:650; font-size:16px;
+    padding:8px 8px 8px 26px; border-radius:999px; transition:transform .2s, box-shadow .2s;
+  }
+  .cta-pill span{
+    display:grid; place-items:center; width:42px; height:42px; border-radius:50%;
+    background:var(--violet); color:#fff; transition:transform .2s;
+  }
+  .cta-pill:hover{ transform:translateY(-2px); box-shadow:0 22px 44px -20px rgba(110,86,247,.9); }
+  .cta-pill:hover span{ transform:translateX(3px); }
+  .cta-quiet{ color:rgba(255,255,255,.72); font-size:15px; font-weight:550; display:inline-flex; align-items:center; gap:8px; transition:color .18s; }
+  .cta-quiet:hover{ color:#fff; }
+
+  .visual{ position:relative; height:420px; display:grid; place-items:center; }
+  .glow{
+    position:absolute; width:340px; height:340px; border-radius:50%;
+    background:radial-gradient(circle, rgba(156,139,255,.55), transparent 62%); filter:blur(28px);
+  }
+  .torus{
+    position:relative; width:400px; height:400px; border-radius:50%;
+    background:conic-gradient(from 200deg,
+      #E9F6F0, #B9ACFF, #6E56F7, #2A2170, #6E56F7, #B0A2FF, #EAF6F0, #C7B9FF, #E9F6F0);
+    -webkit-mask:radial-gradient(circle at 50% 50%, transparent 0 30%, #000 31.5% 49%, transparent 50%);
+    mask:radial-gradient(circle at 50% 50%, transparent 0 30%, #000 31.5% 49%, transparent 50%);
+    filter:saturate(1.12) contrast(1.04);
+    animation:spinin 1.5s cubic-bezier(.2,.8,.2,1) both;
+  }
+  .torus::after{
+    content:""; position:absolute; inset:0; border-radius:50%;
+    background:repeating-conic-gradient(from 0deg, rgba(6,4,12,0) 0 6.4deg, rgba(6,4,12,.22) 6.4deg 7deg);
+    -webkit-mask:radial-gradient(circle at 50% 50%, transparent 0 30%, #000 31.5% 49%, transparent 50%);
+    mask:radial-gradient(circle at 50% 50%, transparent 0 30%, #000 31.5% 49%, transparent 50%);
+    mix-blend-mode:overlay;
+  }
+  .torus-hl{
+    position:absolute; inset:0; margin:auto; width:400px; height:400px; border-radius:50%;
+    background:conic-gradient(from 300deg, transparent 0 40deg, rgba(255,255,255,.7) 58deg, transparent 76deg);
+    -webkit-mask:radial-gradient(circle at 50% 50%, transparent 0 30%, #000 31.5% 49%, transparent 50%);
+    mask:radial-gradient(circle at 50% 50%, transparent 0 30%, #000 31.5% 49%, transparent 50%);
+    opacity:.55;
+  }
+  @keyframes spinin{ from{ transform:rotate(-32deg); opacity:0; } to{ transform:rotate(0); opacity:1; } }
+  @media (prefers-reduced-motion:reduce){ .torus{ animation:none; } }
+
+  /* =========================================================
+     SHOWCASE MOSAIC
+     ========================================================= */
+  .showcase{ margin-top:26px; display:grid; grid-template-columns:1fr 1.25fr; gap:16px; }
+  .bigcard{
+    position:relative; border-radius:var(--r-card); min-height:380px; overflow:hidden; color:#fff;
+    background:linear-gradient(150deg, #3B1F7A, #6E56F7 55%, #8F7BFA 86%, #B9A6FF 96%, #E7DFFF);
+    display:flex; align-items:flex-end; padding:34px;
+  }
+  .bigcard::before{
+    content:""; position:absolute; inset:0;
+    background:radial-gradient(80% 60% at 20% 15%, rgba(255,255,255,.35), transparent 55%);
+  }
+  .bigcard b{ position:relative; font-size:clamp(34px, 4vw, 52px); line-height:1.02; letter-spacing:-.03em; font-weight:800; }
+  .bigcard b span{ display:block; opacity:.78; }
+  .bigcard b span:last-child{ opacity:1; }
+
+  .rightcol{ display:grid; grid-template-rows:auto 1fr 1fr; gap:16px; }
+  .toprow{ display:grid; grid-template-columns:1.15fr .85fr; gap:16px; }
+  .tile{ background:var(--card); border:1px solid var(--line); border-radius:var(--r-card); padding:24px; }
+  .tile.violet{ background:var(--violet); color:#fff; border-color:transparent; }
+  .num{ font-size:52px; font-weight:800; letter-spacing:-.03em; line-height:1; }
+  .tag{ font-size:13.5px; color:var(--muted); margin-top:8px; }
+  .tile.violet .tag{ color:#fff; }
+  .icons{ display:flex; gap:10px; }
+  .icons i{ width:52px; height:52px; border-radius:14px; display:grid; place-items:center; background:var(--tint); color:var(--violet); }
+  .icons i:first-child{ background:var(--violet); color:#fff; }
+  .widecard{
+    background:var(--card); border:1px solid var(--line); border-radius:var(--r-card);
+    padding:22px 26px; display:flex; align-items:center; gap:20px;
+  }
+  .widecard .ic{ width:56px; height:56px; border-radius:16px; flex:none; display:grid; place-items:center; background:var(--tint); color:var(--violet); }
+  .widecard .big{ font-size:30px; font-weight:800; letter-spacing:-.02em; }
+  .widecard .lbl{ color:var(--muted); font-size:15px; }
+
+  /* =========================================================
+     WHO WE ARE
+     ========================================================= */
+  .who{ margin-top:110px; display:grid; grid-template-columns:1fr 1fr; gap:48px; align-items:start; }
+  .who .statement{
+    font-size:clamp(24px, 2.6vw, 34px); line-height:1.28; letter-spacing:-.02em;
+    font-weight:700; margin:24px 0 0; text-wrap:balance;
+  }
+  .who .statement em{ font-style:normal; color:var(--violet); }
+  .who .cols p{ color:var(--body); font-size:16px; line-height:1.7; margin:0 0 18px; max-width:58ch; }
+  .who .cols p:first-child{ margin-top:34px; }
+
+  /* =========================================================
+     WHAT WE DO
+     ========================================================= */
+  .what{ margin-top:110px; text-align:center; }
+  .what h2{ margin-inline:auto; max-width:18ch; }
+  .chips{ display:flex; flex-wrap:wrap; justify-content:center; gap:10px; margin-top:34px; }
+  .chips span{
+    background:var(--card); border:1px solid var(--line); border-radius:999px;
+    padding:11px 18px; font-size:14.5px; font-weight:500; color:var(--body);
+    transition:border-color .18s, color .18s;
+  }
+  .chips span:hover{ border-color:var(--violet-2); color:var(--violet); }
+
+  /* =========================================================
+     APPROACH (loop)
+     ========================================================= */
+  .approach{ margin-top:110px; }
+  .approach-head{ text-align:center; }
+  .steps{
+    list-style:none; counter-reset:step; margin:56px 0 0; padding:0;
+    display:grid; grid-template-columns:repeat(5, 1fr); gap:16px; position:relative;
+  }
+  .steps::before{
+    content:""; position:absolute; top:26px; left:9%; right:9%; height:2px;
+    background:linear-gradient(90deg, var(--line), var(--violet-2), var(--line)); z-index:0;
+  }
+  .step{ position:relative; z-index:1; text-align:center; padding:0 8px; }
+  .step .n{
+    counter-increment:step; width:52px; height:52px; margin:0 auto 18px;
+    border-radius:50%; display:grid; place-items:center;
+    background:var(--card); border:2px solid var(--line);
+    font-weight:800; font-size:15px; color:var(--violet);
+    transition:border-color .2s, transform .2s;
+  }
+  .step .n::before{ content:"0" counter(step); }
+  .step:hover .n{ border-color:var(--violet); transform:translateY(-2px); }
+  .step h3{ font-size:17px; font-weight:700; letter-spacing:-.01em; margin:0 0 6px; }
+  .step p{ font-size:13.5px; line-height:1.55; color:var(--muted); margin:0; }
+  .loopnote{
+    display:flex; justify-content:center; margin-top:36px;
+  }
+  .loopnote span{
+    display:inline-flex; align-items:center; gap:9px;
+    font-size:13.5px; font-weight:550; color:var(--violet);
+    background:var(--tint-2); border-radius:999px; padding:9px 18px;
+  }
+
+  /* =========================================================
+     PRODUCT -- XPENSELY (dark panel)
+     ========================================================= */
+  .product{ margin-top:110px; }
+  .xpensely{
+    background:var(--panel); border-radius:var(--r-panel); color:#fff;
+    padding:64px 56px; position:relative; overflow:hidden; isolation:isolate;
+  }
+  .xpensely::before{
+    content:""; position:absolute; inset:0; z-index:-1;
+    background:radial-gradient(90% 70% at 100% 0%, rgba(110,86,247,.35), transparent 55%);
+  }
+  .prodgrid{ display:grid; grid-template-columns:1fr 1.1fr; gap:48px; align-items:center; }
+  .prod-copy .kicker.on-dark{ background:rgba(255,255,255,.08); border-color:rgba(255,255,255,.14); color:var(--violet-2); }
+  .prod-copy h3{ font-size:clamp(28px, 3.4vw, 42px); font-weight:800; letter-spacing:-.02em; line-height:1.06; margin:22px 0 14px; text-wrap:balance; }
+  .prod-copy .desc{ font-size:16.5px; line-height:1.6; margin:0 0 26px; max-width:44ch; }
+  .xpensely .desc{ color:rgba(255,255,255,.68); }
+  .featlist{ list-style:none; margin:0 0 30px; padding:0; display:grid; gap:13px; }
+  .featlist li{ display:flex; gap:12px; align-items:flex-start; font-size:15px; line-height:1.5; }
+  .xpensely .featlist li{ color:rgba(255,255,255,.82); }
+  .featlist .fdot{
+    flex:none; width:22px; height:22px; margin-top:1px; border-radius:7px;
+    display:grid; place-items:center; background:rgba(110,86,247,.25); color:var(--violet-2);
+  }
+  .prod-cta{
+    display:inline-flex; align-items:center; gap:10px; font-weight:650; font-size:15px;
+    color:#fff; background:var(--violet); border-radius:999px; padding:13px 24px;
+    transition:transform .18s, box-shadow .18s;
+  }
+  .prod-cta:hover{ transform:translateY(-2px); box-shadow:0 16px 34px -14px rgba(110,86,247,.9); }
+
+  /* Xpensely app mock (light card on dark panel) */
+  .mock{
+    background:var(--card); color:var(--ink); border-radius:var(--r-nested); overflow:hidden;
+    box-shadow:0 42px 90px -42px rgba(0,0,0,.85);
+  }
+  .mockbar{ display:flex; align-items:center; gap:8px; padding:14px 18px; border-bottom:1px solid var(--line); }
+  .mockbar i{ width:11px; height:11px; border-radius:50%; }
+  .mockbar i:nth-child(1){ background:#FF5F57; } .mockbar i:nth-child(2){ background:#FEBC2E; } .mockbar i:nth-child(3){ background:#28C840; }
+  .mockbar b{ margin-left:12px; font-size:13px; font-weight:600; color:var(--body); }
+  .mockbar .live{ margin-left:auto; font-size:11px; color:var(--muted); font-family:var(--font-mono); }
+  .mockbody{ display:grid; grid-template-columns:1.1fr 1fr; }
+  .chart{ padding:26px 28px 34px; border-right:1px solid var(--line); }
+  .chart .ct{ font-size:13px; color:var(--muted); }
+  .chart .cv{ font-size:32px; font-weight:800; letter-spacing:-.02em; margin:2px 0 3px; font-variant-numeric:tabular-nums; }
+  .chart .cd{ font-size:12.5px; color:#1E9E62; margin-bottom:26px; font-weight:550; }
+  .bars{ display:flex; align-items:flex-end; gap:12px; height:120px; }
+  .bars .bar{ flex:1; border-radius:6px 6px 0 0; background:var(--tint); position:relative; }
+  .bars .bar.hi{ background:linear-gradient(180deg, var(--violet), var(--violet-deep)); box-shadow:0 10px 24px -10px rgba(110,86,247,.7); }
+  .bars .lab{ position:absolute; bottom:-22px; left:0; right:0; text-align:center; font-size:11px; color:var(--muted); }
+  .chat{ padding:24px; display:flex; flex-direction:column; gap:12px; }
+  .chat .whom{ font-size:11.5px; color:var(--muted); font-weight:650; letter-spacing:.08em; text-transform:uppercase; }
+  .bubble{ font-size:13.5px; line-height:1.55; padding:12px 15px; border-radius:14px; max-width:94%; }
+  .bubble.me{ align-self:flex-end; background:var(--tint); border-bottom-right-radius:4px; color:var(--body); }
+  .bubble.bot{
+    align-self:flex-start; background:rgba(110,86,247,.09);
+    border:1px solid rgba(110,86,247,.25); border-bottom-left-radius:4px; color:var(--ink);
+  }
+  .finbot{ display:flex; align-items:center; gap:8px; margin-top:auto; padding-top:8px; color:var(--muted); font-size:12px; }
+  .finbot .dot{ width:7px; height:7px; border-radius:50%; background:#28C840; box-shadow:0 0 8px 1px rgba(40,200,64,.6); }
+
+  /* =========================================================
+     PRODUCT -- ATELIER (light card, mirrored)
+     ========================================================= */
+  .atelier{
+    background:var(--card); border:1px solid var(--line); border-radius:var(--r-panel);
+    padding:64px 56px; position:relative; overflow:hidden;
+  }
+  .atelier::before{
+    content:""; position:absolute; width:420px; height:420px; left:-140px; bottom:-180px; border-radius:50%;
+    background:radial-gradient(circle, rgba(156,139,255,.18), transparent 65%);
+  }
+  .atelier .desc{ color:var(--muted); }
+  .atelier .featlist li{ color:var(--body); }
+  .atelier .featlist .fdot{ background:var(--tint-2); color:var(--violet); }
+  .atelier .prodgrid{ grid-template-columns:1.1fr 1fr; }
+
+  /* Atelier wardrobe mock */
+  .fit{ position:relative; background:var(--bg); border:1px solid var(--line); border-radius:var(--r-nested); padding:22px; }
+  .fit-head{ display:flex; flex-wrap:wrap; gap:8px; margin-bottom:16px; }
+  .fit-head span{
+    font-size:12px; font-weight:600; color:var(--body);
+    background:var(--card); border:1px solid var(--line); border-radius:999px; padding:6px 12px;
+  }
+  .fit-head span.hl{ background:var(--violet); border-color:transparent; color:#fff; }
+  .fitgrid{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  .piece{
+    background:var(--card); border:1px solid var(--line); border-radius:16px; padding:18px;
+    display:flex; flex-direction:column; gap:12px; transition:transform .2s, box-shadow .2s;
+  }
+  .piece:hover{ transform:translateY(-3px); box-shadow:0 16px 30px -18px rgba(20,16,25,.25); }
+  .piece .pic{ width:44px; height:44px; border-radius:12px; display:grid; place-items:center; background:var(--tint); color:var(--violet); }
+  .piece b{ font-size:14px; font-weight:700; letter-spacing:-.01em; }
+  .piece small{ font-size:12px; color:var(--muted); margin-top:-8px; }
+  .piece.suggest{ border:1.5px dashed var(--violet-2); background:var(--tint-faint); }
+  .piece.suggest .pic{ background:var(--tint-2); }
+  .piece.suggest .why{ font-size:12px; color:var(--violet); font-weight:600; margin-top:-8px; }
+
+  /* =========================================================
+     VALUES
+     ========================================================= */
+  .values{ margin-top:110px; }
+  .values-head{ text-align:center; }
+  .valgrid{ margin-top:52px; display:grid; grid-template-columns:repeat(5, 1fr); gap:14px; }
+  .val{
+    background:var(--card); border:1px solid var(--line); border-radius:var(--r-card);
+    padding:26px 22px; transition:transform .2s, border-color .2s;
+  }
+  .val:hover{ transform:translateY(-3px); border-color:var(--violet-2); }
+  .val .vic{ width:44px; height:44px; border-radius:12px; display:grid; place-items:center; background:var(--tint); color:var(--violet); margin-bottom:18px; }
+  .val h3{ font-size:16.5px; font-weight:700; margin:0 0 7px; letter-spacing:-.01em; }
+  .val p{ font-size:13.5px; line-height:1.55; color:var(--muted); margin:0; }
+
+  /* =========================================================
+     TECHNOLOGY
+     ========================================================= */
+  .tech{
+    margin-top:110px; background:var(--card); border:1px solid var(--line);
+    border-radius:var(--r-panel); padding:52px 56px;
+    display:grid; grid-template-columns:1fr 1.4fr; gap:44px; align-items:center;
+  }
+  .tech h3{ font-size:clamp(22px, 2.4vw, 30px); font-weight:800; letter-spacing:-.02em; line-height:1.15; margin:18px 0 12px; text-wrap:balance; }
+  .tech p{ color:var(--muted); font-size:15px; line-height:1.6; margin:0; max-width:40ch; }
+  .stack{ display:flex; flex-wrap:wrap; gap:10px; }
+  .stack span{
+    font-family:var(--font-mono); font-size:13px; color:var(--body);
+    background:var(--bg); border:1px solid var(--line); border-radius:10px; padding:9px 14px;
+  }
+
+  /* =========================================================
+     JOIN CTA
+     ========================================================= */
+  .join{
+    margin-top:110px; background:var(--panel); border-radius:var(--r-panel); color:#fff;
+    padding:72px 40px; text-align:center; position:relative; overflow:hidden; isolation:isolate;
+  }
+  .join::before{
+    content:""; position:absolute; inset:0; z-index:-1;
+    background:radial-gradient(70% 120% at 50% 0%, rgba(110,86,247,.35), transparent 60%);
+  }
+  .join h2{ font-size:clamp(30px, 4.4vw, 52px); letter-spacing:-.03em; font-weight:800; margin:0 0 14px; text-wrap:balance; }
+  .join p{ color:rgba(255,255,255,.66); margin:0 auto 32px; max-width:46ch; font-size:17px; line-height:1.6; }
+  .signup{
+    display:flex; gap:8px; width:min(460px, 90%); margin:0 auto;
+    background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.16);
+    border-radius:999px; padding:7px 7px 7px 20px;
+  }
+  .signup input{ flex:1; min-width:0; background:none; border:0; outline:none; color:#fff; font-size:15px; font-family:var(--font-sans); }
+  .signup input::placeholder{ color:rgba(255,255,255,.5); }
+  .signup:focus-within{ outline:2px solid var(--violet-2); outline-offset:3px; }
+  .signup button{
+    background:#fff; color:var(--ink); border:0; font-weight:650; font-size:14.5px;
+    padding:12px 22px; border-radius:999px; cursor:pointer; font-family:var(--font-sans);
+    transition:transform .18s; white-space:nowrap;
+  }
+  .signup button:hover{ transform:translateY(-1px); }
+  .join .ok{ color:var(--mint); font-weight:600; font-size:15px; margin-top:18px; }
+
+  /* =========================================================
+     FOOTER
+     ========================================================= */
+  .footer{ margin-top:96px; border-top:1px solid var(--line); padding:56px 0 48px; }
+  .footgrid{ display:flex; justify-content:space-between; gap:40px; flex-wrap:wrap; }
+  .foot-tag{ max-width:34ch; }
+  .foot-tag .brandrow{ display:flex; align-items:center; gap:10px; font-weight:700; font-size:16px; }
+  .foot-tag h3{ font-size:20px; font-weight:750; letter-spacing:-.01em; margin:16px 0 8px; }
+  .foot-tag p{ color:var(--muted); font-size:14px; line-height:1.6; margin:0; }
+  .footcols{ display:flex; gap:64px; flex-wrap:wrap; }
+  .fcol b{ display:block; font-size:13px; margin-bottom:14px; color:var(--ink); }
+  .fcol a{ display:block; color:var(--muted); font-size:13.5px; margin-bottom:10px; transition:color .15s; }
+  .fcol a:hover{ color:var(--violet); }
+  .copy{
+    margin-top:44px; padding-top:22px; border-top:1px solid var(--line);
+    display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap;
+    color:var(--muted); font-size:13px;
+  }
+
+  /* =========================================================
+     RESPONSIVE
+     ========================================================= */
+  @media (max-width:980px){
+    .steps{ grid-template-columns:repeat(5, 1fr); gap:8px; }
+    .step p{ display:none; }
+    .mockbody{ grid-template-columns:1fr; }
+    .chart{ border-right:0; border-bottom:1px solid var(--line); }
+  }
+  @media (max-width:900px){
+    .herogrid, .showcase, .who, .prodgrid, .atelier .prodgrid, .tech{ grid-template-columns:1fr; }
+    .visual{ height:300px; order:-1; }
+    .torus, .torus-hl{ width:300px; height:300px; }
+    .glow{ width:250px; height:250px; }
+    .hero, .xpensely, .atelier{ padding:44px 28px 52px; }
+    .tech{ padding:40px 28px; }
+    .atelier .fit{ order:2; }
+    .valgrid{ grid-template-columns:repeat(2, 1fr); }
+    .val:last-child{ grid-column:1 / -1; }
+    .steps{ grid-template-columns:1fr; gap:22px; }
+    .steps::before{ display:none; }
+    .step{ display:grid; grid-template-columns:52px 1fr; gap:16px; text-align:left; align-items:start; }
+    .step .n{ margin:0; }
+    .step p{ display:block; }
+    .who .cols p:first-child{ margin-top:0; }
+    .who{ gap:20px; }
+  }
+  @media (max-width:780px){
+    .navlinks{ display:none; }
+    .navcta{ margin-left:auto; }
+  }
+  @media (max-width:560px){
+    .valgrid{ grid-template-columns:1fr; }
+    .fitgrid{ grid-template-columns:1fr; }
+    .toprow{ grid-template-columns:1fr; }
+    .signup{ flex-direction:column; border-radius:24px; padding:10px; }
+    .signup input{ padding:10px 12px; }
+  }
+</style>
+
+<a class="skip" href="#main">Skip to content</a>
+
+<nav class="nav" aria-label="Main">
+  <span class="brand">
+    <svg width="28" height="28" viewBox="0 0 28 28" fill="none" aria-hidden="true"><rect width="28" height="28" rx="9" fill="#6E56F7"/><path d="M8.6 14a2.9 2.9 0 105.8 0 2.9 2.9 0 00-5.8 0zm5 0a2.9 2.9 0 105.8 0 2.9 2.9 0 00-5.8 0z" stroke="#fff" stroke-width="1.7"/></svg>
+    <b>Ohris Concepts</b>
+  </span>
+  <div class="navlinks">
+    <a href="#who">Who we are</a>
+    <a href="#what">What we do</a>
+    <a href="#products">Products</a>
+    <a href="#approach">Approach</a>
+  </div>
+  <a href="#join" class="navcta">Let's talk</a>
+</nav>
+
+<main id="main" class="wrap" style="padding-bottom:0;">
+
+  <!-- ================= HERO ================= -->
+  <header class="hero">
+    <div class="herogrid">
+      <div>
+        <div class="dots" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
+        <h1>Crafting intelligent software for <em>everyday life.</em></h1>
+        <p class="sub">We turn real problems into products people genuinely love to use &mdash; designed with care, built to last.</p>
+        <div class="hero-actions">
+          <a href="#join" class="cta-pill">Let's connect
+            <span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          </a>
+          <a href="#products" class="cta-quiet">See the products
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 5v14M6 13l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </a>
+        </div>
+      </div>
+      <div class="visual" aria-hidden="true">
+        <div class="glow"></div>
+        <div class="torus"></div>
+        <div class="torus-hl"></div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ================= SHOWCASE MOSAIC ================= -->
+  <section class="showcase" aria-label="Highlights">
+    <div class="bigcard rev">
+      <b><span>Design</span><span>Develop</span><span>Deploy</span></b>
+    </div>
+    <div class="rightcol">
+      <div class="toprow">
+        <div class="tile violet rev">
+          <div class="num">02</div>
+          <div class="tag">Products live today &mdash; Xpensely &amp; Atelier, with more in the works</div>
+        </div>
+        <div class="tile rev">
+          <div class="icons">
+            <i><svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3v18M7 8h7a3 3 0 010 6H7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></i>
+            <i><svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 3h9l3 4v12a2 2 0 01-2 2H6a2 2 0 01-2-2V5a2 2 0 012-2z" stroke="currentColor" stroke-width="2"/></svg></i>
+            <i><svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 4l2.2 4.8L19 11l-4.8 2.2L12 18l-2.2-4.8L5 11l4.8-2.2L12 4z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg></i>
+          </div>
+          <div class="tag" style="margin-top:16px;">Finance, fashion &amp; applied AI &mdash; one studio</div>
+        </div>
+      </div>
+      <div class="widecard rev">
+        <span class="ic"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3a4 4 0 014 4v4a4 4 0 01-8 0V7a4 4 0 014-4zM5 11a7 7 0 0014 0M12 18v3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>
+        <div><div class="big">Voice-enabled AI</div><div class="lbl">FinBot answers real money questions, out loud</div></div>
+      </div>
+      <div class="widecard rev">
+        <span class="ic"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M7 18a5 5 0 01-.5-9.98A6 6 0 0118 9a4 4 0 01-.5 9H7z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg></span>
+        <div><div class="big">Cloud-native</div><div class="lbl">Secure &amp; scalable from day one</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= WHO WE ARE ================= -->
+  <section class="who" id="who">
+    <div class="rev">
+      <span class="kicker">Who we are</span>
+      <h2 class="statement">A technology studio building a family of products that make life <em>simpler</em> &mdash; not more complicated.</h2>
+    </div>
+    <div class="cols rev">
+      <p>Ohris Concepts is the studio behind a growing portfolio of software spanning financial technology, fashion technology and applied AI. We're guided by one belief: technology should feel intelligent, intuitive and genuinely useful.</p>
+      <p>We aren't tied to a single industry. Every product we ship blends thoughtful design, solid engineering and practical AI to solve problems that actually matter &mdash; and to earn a place in people's daily lives.</p>
+    </div>
+  </section>
+
+  <!-- ================= WHAT WE DO ================= -->
+  <section class="what" id="what">
+    <span class="kicker rev">What we do
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="#6E56F7" aria-hidden="true"><path d="M12 2l2.5 6.5L21 11l-6.5 2.5L12 20l-2.5-6.5L3 11l6.5-2.5L12 2z"/></svg>
+    </span>
+    <h2 class="sec-title rev">We build fewer things, and make them <em>genuinely useful.</em></h2>
+    <div class="chips rev">
+      <span>Applied AI</span><span>SaaS Platforms</span><span>Financial Technology</span>
+      <span>Mobile Apps</span><span>Web Applications</span><span>Automation</span>
+      <span>Data Analytics</span><span>Product Design</span>
+    </div>
+  </section>
+
+  <!-- ================= PRODUCTS ================= -->
+  <section class="product" id="products">
+    <div class="xpensely">
+      <div class="prodgrid">
+        <div class="prod-copy rev">
+          <span class="kicker on-dark">Xpensely</span>
+          <h3>Your money, understood.</h3>
+          <p class="desc">An AI-powered personal finance platform. At its core is FinBot &mdash; a voice-enabled assistant that turns raw transactions into decisions you can act on.</p>
+          <ul class="featlist">
+            <li><span class="fdot"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Intelligent insights into where your money actually goes</li>
+            <li><span class="fdot"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Personalized planning, budgeting and goal setting</li>
+            <li><span class="fdot"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Every account in one place, one clear picture</li>
+            <li><span class="fdot"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Ask by voice or text &mdash; get answers in plain language</li>
+          </ul>
+          <a href="#join" class="prod-cta">Get early access
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+        </div>
+        <div class="mock rev" role="img" aria-label="Xpensely app preview: monthly spend chart and a FinBot conversation">
+          <div class="mockbar"><i></i><i></i><i></i><b>Xpensely &mdash; This month</b><span class="live">FinBot &middot; live</span></div>
+          <div class="mockbody">
+            <div class="chart">
+              <div class="ct">Total spend &middot; July</div>
+              <div class="cv">$2,418.60</div>
+              <div class="cd">&#9660; 12% vs. June &mdash; nice work</div>
+              <div class="bars">
+                <div class="bar" style="height:46%"><span class="lab">Mar</span></div>
+                <div class="bar" style="height:64%"><span class="lab">Apr</span></div>
+                <div class="bar" style="height:52%"><span class="lab">May</span></div>
+                <div class="bar" style="height:78%"><span class="lab">Jun</span></div>
+                <div class="bar hi" style="height:69%"><span class="lab">Jul</span></div>
+              </div>
+            </div>
+            <div class="chat">
+              <div class="whom">FinBot</div>
+              <div class="bubble me">Can I afford a $600 flight next month?</div>
+              <div class="bubble bot">Yes &mdash; you're trending <b>$290 under budget</b> and your Travel goal has $540 saved. Book it, and I'll top up the goal by $60 automatically.</div>
+              <div class="finbot"><span class="dot"></span> FinBot is listening &mdash; ask by voice or text</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="atelier" style="margin-top:20px;">
+      <div class="prodgrid">
+        <div class="fit rev" role="img" aria-label="Atelier outfit preview: tonight's curated look &mdash; silk blouse, tailored trousers and leather loafers from your wardrobe, plus a suggested camel coat that completes this and six more outfits">
+          <div class="fit-head">
+            <span class="hl">Tonight's look</span><span>Dinner</span><span>Smart casual</span><span>24&deg;</span>
+          </div>
+          <div class="fitgrid">
+            <div class="piece">
+              <span class="pic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 4l3 2 3-2 4 3-2 3-1.5-1V20h-7V9L7 10 5 7l4-3z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg></span>
+              <b>Silk blouse</b><small>From your wardrobe</small>
+            </div>
+            <div class="piece">
+              <span class="pic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M8 3h8l1.5 18h-5L12 12l-.5 9h-5L8 3z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg></span>
+              <b>Tailored trousers</b><small>From your wardrobe</small>
+            </div>
+            <div class="piece">
+              <span class="pic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 16c5 0 8-4 10-4 3 0 6 2 6 5v1H4v-2zM4 18h16" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg></span>
+              <b>Leather loafers</b><small>From your wardrobe</small>
+            </div>
+            <div class="piece suggest">
+              <span class="pic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>
+              <b>Camel coat</b><span class="why">Completes this + 6 more outfits you own</span>
+            </div>
+          </div>
+        </div>
+        <div class="prod-copy rev">
+          <span class="kicker">Atelier</span>
+          <h3>Your wardrobe, reimagined.</h3>
+          <p class="desc">An AI-powered fashion platform that helps you get more out of the clothes you already own &mdash; instead of pushing you to buy more.</p>
+          <ul class="featlist">
+            <li><span class="fdot"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></span>AI outfit curation from your own closet</li>
+            <li><span class="fdot"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></span>A digital wardrobe you can browse anywhere</li>
+            <li><span class="fdot"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Styling matched to the occasion, weather and you</li>
+            <li><span class="fdot"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Smart, intentional shopping &mdash; only what completes your style</li>
+          </ul>
+          <a href="#join" class="prod-cta">Get early access
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= APPROACH ================= -->
+  <section class="approach" id="approach">
+    <div class="approach-head">
+      <span class="kicker rev">How we build</span>
+      <h2 class="sec-title rev" style="margin-inline:auto; max-width:20ch;">Great products start with people, <em>not technology.</em></h2>
+    </div>
+    <ol class="steps">
+      <li class="step rev">
+        <span class="n" aria-hidden="true"></span>
+        <div><h3>Understand</h3><p>Research the real problem before writing a line of code.</p></div>
+      </li>
+      <li class="step rev">
+        <span class="n" aria-hidden="true"></span>
+        <div><h3>Design</h3><p>Craft an experience that feels obvious the first time.</p></div>
+      </li>
+      <li class="step rev">
+        <span class="n" aria-hidden="true"></span>
+        <div><h3>Build</h3><p>Engineer reliable, scalable software with modern tools.</p></div>
+      </li>
+      <li class="step rev">
+        <span class="n" aria-hidden="true"></span>
+        <div><h3>Learn</h3><p>Improve through customer feedback and product analytics.</p></div>
+      </li>
+      <li class="step rev">
+        <span class="n" aria-hidden="true"></span>
+        <div><h3>Evolve</h3><p>Use AI to make the product smarter over time.</p></div>
+      </li>
+    </ol>
+    <div class="loopnote rev">
+      <span>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 12a8 8 0 0113.6-5.7M20 12a8 8 0 01-13.6 5.7M17 3v4h-4M7 21v-4h4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        &hellip;then back to understand. It's a loop, not a line.
+      </span>
+    </div>
+  </section>
+
+  <!-- ================= VALUES ================= -->
+  <section class="values" id="values">
+    <div class="values-head">
+      <span class="kicker rev">What we value</span>
+      <h2 class="sec-title rev" style="margin-inline:auto; max-width:18ch;">Five principles, in <em>every release.</em></h2>
+    </div>
+    <div class="valgrid">
+      <div class="val rev">
+        <span class="vic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3l2.3 5.2L20 9l-4 3.9.9 5.6L12 16l-4.9 2.5.9-5.6L4 9l5.7-.8L12 3z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg></span>
+        <h3>Innovation</h3><p>We keep looking for better ways to solve problems.</p>
+      </div>
+      <div class="val rev">
+        <span class="vic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 18L18 4M9 4h9v9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        <h3>Simplicity</h3><p>Powerful software should feel effortless.</p>
+      </div>
+      <div class="val rev">
+        <span class="vic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3l7 3v5c0 4.4-3 7.6-7 9-4-1.4-7-4.6-7-9V6l7-3z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        <h3>Integrity</h3><p>We build products people can trust.</p>
+      </div>
+      <div class="val rev">
+        <span class="vic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span>
+        <h3>Quality</h3><p>Craftsmanship, reliability and attention to detail.</p>
+      </div>
+      <div class="val rev">
+        <span class="vic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 12a4 4 0 100-8 4 4 0 000 8zM4 21a8 8 0 0116 0" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        <h3>User first</h3><p>Every decision starts with the person using it.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= TECHNOLOGY ================= -->
+  <section class="tech rev" id="technology" aria-label="Technology">
+    <div>
+      <span class="kicker">Technology</span>
+      <h3>A modern, cloud-native stack &mdash; chosen for the long run.</h3>
+      <p>We prioritize performance, scalability and security from day one, so every product is ready to grow.</p>
+    </div>
+    <div class="stack">
+      <span>AI &amp; LLMs</span><span>React</span><span>React Native</span><span>Next.js</span>
+      <span>TypeScript</span><span>PostgreSQL</span><span>Secure APIs</span>
+      <span>Cloud infrastructure</span><span>Modern DevOps</span>
+    </div>
+  </section>
+
+  <!-- ================= JOIN ================= -->
+  <section class="join" id="join">
+    <h2 class="rev">Join our journey.</h2>
+    <p class="rev">We're just getting started. Customer, collaborator, investor or future teammate &mdash; we'd love to have you along.</p>
+    <form class="signup rev" id="signup" aria-label="Get in touch">
+      <input type="email" required placeholder="you@company.com" aria-label="Email address" />
+      <button type="submit">Get in touch</button>
+    </form>
+    <div class="ok" role="status"></div>
+  </section>
+
+  <!-- ================= FOOTER ================= -->
+  <footer class="footer">
+    <div class="footgrid">
+      <div class="foot-tag">
+        <span class="brandrow">
+          <svg width="26" height="26" viewBox="0 0 28 28" fill="none" aria-hidden="true"><rect width="28" height="28" rx="9" fill="#6E56F7"/><path d="M8.6 14a2.9 2.9 0 105.8 0 2.9 2.9 0 00-5.8 0zm5 0a2.9 2.9 0 105.8 0 2.9 2.9 0 00-5.8 0z" stroke="#fff" stroke-width="1.7"/></svg>
+          Ohris Concepts
+        </span>
+        <h3>Building intelligent software for everyday life.</h3>
+        <p>Elegant design, practical functionality and AI that actually works.</p>
+      </div>
+      <div class="footcols">
+        <div class="fcol"><b>Products</b><a href="#products">Xpensely</a><a href="#products">Atelier</a><a href="#join">What's next</a></div>
+        <div class="fcol"><b>Company</b><a href="#who">Who we are</a><a href="#what">What we do</a><a href="#approach">Approach</a><a href="#values">Values</a></div>
+        <div class="fcol"><b>Connect</b><a href="#join">Contact</a><a href="#join">Partners</a><a href="#join">Careers</a></div>
+      </div>
+    </div>
+    <div class="copy">
+      <span>&copy; 2026 Ohris Concepts. All rights reserved.</span>
+      <span>Privacy &middot; Terms</span>
+    </div>
+  </footer>
+
+</main>
+
+<script>
+  // Gate reveal styles behind JS so a script failure never hides content
+  document.documentElement.classList.add('js');
+
+  // Scroll reveal -- IO for elements below the fold, with two safety nets:
+  // in-viewport elements reveal immediately, and everything force-reveals
+  // after 2.5s so content can never stay hidden if IO misbehaves.
+  const reveal = el => el.classList.add('in');
+  const io = ('IntersectionObserver' in window)
+    ? new IntersectionObserver((entries) => {
+        for (const e of entries) {
+          if (e.isIntersecting) { reveal(e.target); io.unobserve(e.target); }
+        }
+      }, { threshold: 0.12, rootMargin: '0px 0px -6% 0px' })
+    : null;
+  document.querySelectorAll('.rev').forEach(el => {
+    if (el.getBoundingClientRect().top < window.innerHeight * 0.94) reveal(el);
+    else if (io) io.observe(el);
+    else reveal(el);
+  });
+  setTimeout(() => document.querySelectorAll('.rev:not(.in)').forEach(reveal), 2500);
+
+  // Signup micro-interaction (mock -- no data is sent anywhere)
+  document.getElementById('signup').addEventListener('submit', (ev) => {
+    ev.preventDefault();
+    document.querySelector('#join .ok').textContent = 'Thanks \u2014 we\'ll be in touch soon.';
+    ev.target.querySelector('button').textContent = 'Sent';
+  });
+</script>
