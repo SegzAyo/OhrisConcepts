@@ -146,7 +146,7 @@
   .cta-quiet{ color:rgba(255,255,255,.72); font-size:15px; font-weight:550; display:inline-flex; align-items:center; gap:8px; transition:color .18s; }
   .cta-quiet:hover{ color:#fff; }
 
-  .visual{ position:relative; height:420px; display:grid; place-items:center; }
+  .visual{ position:relative; height:420px; display:grid; place-items:center; will-change:transform; }
   .glow{
     position:absolute; width:340px; height:340px; border-radius:50%;
     background:radial-gradient(circle, rgba(156,139,255,.55), transparent 62%); filter:blur(28px);
@@ -830,6 +830,21 @@
     if (due.length) revealStaggered(due);
     if (!steps.classList.contains('draw') && steps.getBoundingClientRect().top < vh) drawSteps();
   }, { passive: true });
+
+  // Hero parallax: the torus drifts slightly slower than the page scroll
+  const visual = document.querySelector('.hero .visual');
+  if (visual && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    let ticking = false;
+    const drift = () => {
+      ticking = false;
+      const y = window.scrollY;
+      if (y > 1200) return;
+      visual.style.transform = 'translateY(' + Math.min(y * 0.07, 48).toFixed(1) + 'px)';
+    };
+    window.addEventListener('scroll', () => {
+      if (!ticking) { ticking = true; requestAnimationFrame(drift); }
+    }, { passive: true });
+  }
 
   // Signup micro-interaction (mock -- no data is sent anywhere)
 
