@@ -276,12 +276,15 @@
      ========================================================= */
   .product{ margin-top:110px; }
   .xpensely{
-    background:var(--panel); border-radius:var(--r-panel); color:#fff;
+    background:linear-gradient(140deg, #191227 0%, #241A43 55%, #2C1F54 100%);
+    border-radius:var(--r-panel); color:#fff;
     padding:64px 56px; position:relative; overflow:hidden; isolation:isolate;
   }
   .xpensely::before{
     content:""; position:absolute; inset:0; z-index:-1;
-    background:radial-gradient(90% 70% at 100% 0%, rgba(110,86,247,.35), transparent 55%);
+    background:
+      radial-gradient(55% 62% at 74% 52%, rgba(140,110,255,.42), transparent 68%),
+      radial-gradient(90% 70% at 100% 0%, rgba(110,86,247,.45), transparent 60%);
   }
   .prodgrid{ display:grid; grid-template-columns:1fr 1.1fr; gap:48px; align-items:center; }
   .prod-copy .kicker.on-dark{ background:rgba(255,255,255,.08); border-color:rgba(255,255,255,.14); color:var(--violet-2); }
