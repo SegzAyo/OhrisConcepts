@@ -70,10 +70,33 @@
   .sec-lead{ color:var(--muted); font-size:17px; line-height:1.6; max-width:56ch; margin:16px 0 0; }
 
   /* ---------- reveal on scroll (JS-gated so no-JS still shows all) ---------- */
-  html.js .rev{ opacity:0; transform:translateY(18px); transition:opacity .7s ease, transform .7s cubic-bezier(.2,.8,.2,1); }
-  html.js .rev.in{ opacity:1; transform:none; }
+  html.js .rev{
+    --rev-x:0px; --rev-y:42px; --rev-scale:.985;
+    opacity:0; translate:var(--rev-x) var(--rev-y); scale:var(--rev-scale);
+    transition:
+      opacity .72s ease-out,
+      translate .9s cubic-bezier(.16,1,.3,1),
+      scale .9s cubic-bezier(.16,1,.3,1);
+    transition-delay:var(--reveal-delay, 0ms);
+  }
+  html.js .rev.in{ opacity:1; translate:0 0; scale:1; will-change:opacity, translate, scale; }
+
+  /* Direction and depth are tuned to the composition, not applied as one slab. */
+  html.js .showcase .bigcard.rev{ --rev-x:-44px; --rev-y:24px; --rev-scale:.96; }
+  html.js .showcase .rightcol .rev{ --rev-x:44px; --rev-y:20px; --rev-scale:.975; }
+  html.js .who > .rev:first-child{ --rev-x:-48px; --rev-y:0px; }
+  html.js .who > .rev:last-child{ --rev-x:48px; --rev-y:0px; }
+  html.js .chips > .rev{ --rev-y:28px; --rev-scale:.95; }
+  html.js .xpensely .prod-copy.rev{ --rev-x:-56px; --rev-y:0px; }
+  html.js .xpensely .phone-wrap.rev{ --rev-x:58px; --rev-y:18px; --rev-scale:.955; }
+  html.js .atelier .phone-wrap.rev{ --rev-x:-58px; --rev-y:18px; --rev-scale:.955; }
+  html.js .atelier .prod-copy.rev{ --rev-x:56px; --rev-y:0px; }
+  html.js .val.rev{ --rev-y:38px; --rev-scale:.95; }
+  html.js .tech > .rev:first-child{ --rev-x:-42px; --rev-y:0px; }
+  html.js .stack > .rev{ --rev-x:32px; --rev-y:0px; --rev-scale:.95; }
+
   @media (prefers-reduced-motion:reduce){
-    html.js .rev{ opacity:1; transform:none; transition:none; }
+    html.js .rev{ opacity:1; translate:0 0; scale:1; transition:none; will-change:auto; }
   }
 
   /* =========================================================
@@ -149,11 +172,18 @@
   .cta-quiet{ color:rgba(255,255,255,.72); font-size:15px; font-weight:550; display:inline-flex; align-items:center; gap:8px; transition:color .18s; }
   .cta-quiet:hover{ color:#fff; }
 
-  .visual{ position:relative; height:420px; display:grid; place-items:center; will-change:transform; }
+  .visual{ position:relative; height:420px; }
+  .visual-motion{
+    position:absolute; inset:0; display:grid; place-items:center;
+    transform:translate3d(0, var(--hero-y, 0px), 0) rotate(var(--hero-r, 0deg)) scale(var(--hero-scale, 1));
+    transform-origin:50% 52%; will-change:transform;
+  }
   .glow{
     position:absolute; width:340px; height:340px; border-radius:50%;
     background:radial-gradient(circle, rgba(156,139,255,.55), transparent 62%); filter:blur(28px);
+    transform:translate3d(0, var(--glow-y, 0px), 0) scale(var(--glow-scale, 1));
   }
+
   .torus{
     position:relative; width:400px; height:400px; border-radius:50%;
     background:conic-gradient(from 200deg,
@@ -177,8 +207,12 @@
     mask:radial-gradient(circle at 50% 50%, transparent 0 30%, #000 31.5% 49%, transparent 50%);
     opacity:.55;
   }
+
   @keyframes spinin{ from{ transform:rotate(-32deg); opacity:0; } to{ transform:rotate(0); opacity:1; } }
-  @media (prefers-reduced-motion:reduce){ .torus{ animation:none; } }
+  @media (prefers-reduced-motion:reduce){
+    .torus{ animation:none; }
+    .visual-motion, .glow{ transform:none; will-change:auto; }
+  }
 
   /* =========================================================
      SHOWCASE MOSAIC
@@ -253,28 +287,21 @@
     content:""; position:absolute; top:26px; left:9%; right:9%; height:2px;
     background:linear-gradient(90deg, var(--line), var(--violet-2), var(--line)); z-index:0;
   }
-  /* line draws itself in, steps + numbers light up as it passes */
-  html.js .steps::before{ transform:scaleX(0); transform-origin:left center; transition:transform 1.15s cubic-bezier(.45,0,.2,1) .1s; }
-  html.js .steps.draw::before{ transform:scaleX(1); }
-  html.js .steps .step{ opacity:0; transform:translateY(16px); transition:opacity .55s ease, transform .55s cubic-bezier(.2,.8,.2,1); }
-  html.js .steps.draw .step{ opacity:1; transform:none; }
-  html.js .steps.draw .step:nth-child(1){ transition-delay:.05s; }
-  html.js .steps.draw .step:nth-child(2){ transition-delay:.28s; }
-  html.js .steps.draw .step:nth-child(3){ transition-delay:.5s; }
-  html.js .steps.draw .step:nth-child(4){ transition-delay:.72s; }
-  html.js .steps.draw .step:nth-child(5){ transition-delay:.94s; }
-  .steps.draw .step .n{ border-color:var(--violet); box-shadow:0 8px 20px -10px rgba(110,86,247,.55); }
-  .steps.draw .step:nth-child(1) .n{ transition-delay:.15s; }
-  .steps.draw .step:nth-child(2) .n{ transition-delay:.4s; }
-  .steps.draw .step:nth-child(3) .n{ transition-delay:.62s; }
-  .steps.draw .step:nth-child(4) .n{ transition-delay:.85s; }
-  .steps.draw .step:nth-child(5) .n{ transition-delay:1.06s; }
-  /* once the choreography has played, drop the delays so hover feels instant */
-  .steps.drawn .step, .steps.drawn .step .n{ transition-delay:0s !important; }
+  /* Scroll progress draws the line and brings each step forward in sequence. */
+  html.js .steps::before{
+    transform:scaleX(var(--line-progress, 0)); transform-origin:left center;
+    will-change:transform;
+  }
+  html.js .steps .step{
+    opacity:var(--step-opacity, 0);
+    transform:translate3d(0, var(--step-y, 34px), 0) scale(var(--step-scale, .96));
+    will-change:opacity, transform;
+  }
+  .steps .step.active .n{ border-color:var(--violet); box-shadow:0 8px 20px -10px rgba(110,86,247,.55); }
   @media (prefers-reduced-motion:reduce){
-    html.js .steps::before{ transform:none; transition:none; }
-    html.js .steps .step{ opacity:1; transform:none; transition:none; }
-    .steps.draw .step .n{ transition:none; }
+    html.js .steps::before{ transform:none; will-change:auto; }
+    html.js .steps .step{ opacity:1; transform:none; will-change:auto; }
+    .steps .step .n{ transition:none; }
   }
   .step{ position:relative; z-index:1; text-align:center; padding:0 8px; }
   .step .n{
@@ -334,12 +361,15 @@
   /* Product phone screenshots */
   .phone-wrap{ display:flex; justify-content:center; }
   .phone{
-    width:min(290px, 78vw); flex:none;
+    width:min(290px, calc(100% - 12px)); flex:none;
     background:#0D0B12; border-radius:50px; padding:10px;
     box-shadow:0 46px 90px -34px rgba(0,0,0,.6), 0 0 0 1px rgba(255,255,255,.08);
+    transform:translate3d(0, var(--phone-y, 0px), 0) rotate(var(--phone-r, 0deg)) scale(var(--phone-scale, 1));
+    transform-origin:50% 55%; will-change:transform;
   }
   .atelier .phone{ box-shadow:0 40px 80px -36px rgba(20,16,25,.4), 0 0 0 1px rgba(20,16,25,.08); }
   .phone img{ display:block; width:100%; height:auto; border-radius:40px; }
+  @media (prefers-reduced-motion:reduce){ .phone{ transform:none; will-change:auto; } }
 
   /* =========================================================
      PRODUCT -- ATELIER (light card, mirrored)
@@ -461,6 +491,18 @@
     .step p{ display:block; }
     .who .cols p:first-child{ margin-top:0; }
     .who{ gap:20px; }
+    html.js .showcase .bigcard.rev,
+    html.js .showcase .rightcol .rev,
+    html.js .who > .rev:first-child,
+    html.js .who > .rev:last-child,
+    html.js .xpensely .prod-copy.rev,
+    html.js .xpensely .phone-wrap.rev,
+    html.js .atelier .phone-wrap.rev,
+    html.js .atelier .prod-copy.rev,
+    html.js .tech > .rev:first-child,
+    html.js .stack > .rev{
+      --rev-x:0px; --rev-y:34px;
+    }
   }
   @media (max-width:780px){
     .navlinks{ display:none; }
@@ -528,9 +570,11 @@
         </div>
       </div>
       <div class="visual" aria-hidden="true">
-        <div class="glow"></div>
-        <div class="torus"></div>
-        <div class="torus-hl"></div>
+        <div class="visual-motion">
+          <div class="glow"></div>
+          <div class="torus"></div>
+          <div class="torus-hl"></div>
+        </div>
       </div>
     </div>
   </header>
@@ -584,10 +628,10 @@
       <svg width="13" height="13" viewBox="0 0 24 24" fill="#6E56F7" aria-hidden="true"><path d="M12 2l2.5 6.5L21 11l-6.5 2.5L12 20l-2.5-6.5L3 11l6.5-2.5L12 2z"/></svg>
     </span>
     <h2 class="sec-title rev">We build fewer things, and make them <em>genuinely useful.</em></h2>
-    <div class="chips rev">
-      <span>Applied AI</span><span>SaaS Platforms</span><span>Financial Technology</span>
-      <span>Mobile Apps</span><span>Web Applications</span><span>Automation</span>
-      <span>Data Analytics</span><span>Product Design</span>
+    <div class="chips">
+      <span class="rev">Applied AI</span><span class="rev">SaaS Platforms</span><span class="rev">Financial Technology</span>
+      <span class="rev">Mobile Apps</span><span class="rev">Web Applications</span><span class="rev">Automation</span>
+      <span class="rev">Data Analytics</span><span class="rev">Product Design</span>
     </div>
   </section>
 
@@ -707,16 +751,16 @@
   </section>
 
   <!-- ================= TECHNOLOGY ================= -->
-  <section class="tech rev" id="technology" aria-label="Technology">
-    <div>
+  <section class="tech" id="technology" aria-label="Technology">
+    <div class="rev">
       <span class="kicker">Technology</span>
       <h3>A modern, cloud-native stack &mdash; chosen for the long run.</h3>
       <p>We prioritize performance, scalability and security from day one, so every product is ready to grow.</p>
     </div>
     <div class="stack">
-      <span>AI &amp; LLMs</span><span>React</span><span>React Native</span><span>Next.js</span>
-      <span>TypeScript</span><span>PostgreSQL</span><span>Secure APIs</span>
-      <span>Cloud infrastructure</span><span>Modern DevOps</span>
+      <span class="rev">AI &amp; LLMs</span><span class="rev">React</span><span class="rev">React Native</span><span class="rev">Next.js</span>
+      <span class="rev">TypeScript</span><span class="rev">PostgreSQL</span><span class="rev">Secure APIs</span>
+      <span class="rev">Cloud infrastructure</span><span class="rev">Modern DevOps</span>
     </div>
   </section>
 
@@ -763,90 +807,171 @@
 <script>
   // Gate reveal styles behind JS so a script failure never hides content
   document.documentElement.classList.add('js');
+  window.addEventListener('error', () => document.documentElement.classList.remove('js'), { once: true });
 
-  // Scroll reveal -- elements fade up when they enter view. Siblings that
-  // arrive in the same batch cascade 80ms apart, and the .rev class is
-  // stripped once the transition ends so hover effects run un-delayed.
-  const reveal = el => el.classList.add('in');
-  const finish = el => { el.classList.remove('rev'); el.style.transitionDelay = ''; };
+  const motionQuery = matchMedia('(prefers-reduced-motion: reduce)');
+  const reduceMotion = motionQuery.matches;
+  const revealElements = [...document.querySelectorAll('.rev')];
+  const revealListeners = new WeakMap();
+  let io = null;
+  const reveal = el => {
+    el.classList.add('in');
+    if (io) io.unobserve(el);
+  };
+  const finish = el => {
+    const listener = revealListeners.get(el);
+    if (listener) {
+      el.removeEventListener('transitionend', listener);
+      revealListeners.delete(el);
+    }
+    if (io) io.unobserve(el);
+    el.classList.remove('rev');
+    el.style.removeProperty('--reveal-delay');
+  };
   const revealStaggered = els => els.forEach((el, i) => {
-    el.style.transitionDelay = Math.min(i * 80, 480) + 'ms';
+    el.style.setProperty('--reveal-delay', Math.min(i * 110, 660) + 'ms');
     reveal(el);
   });
-  document.querySelectorAll('.rev').forEach(el =>
-    el.addEventListener('transitionend', () => finish(el), { once: true }));
 
-  const io = ('IntersectionObserver' in window)
-    ? new IntersectionObserver((entries) => {
+  if (reduceMotion) {
+    revealElements.forEach(el => { reveal(el); finish(el); });
+  } else {
+    revealElements.forEach(el => {
+      const onRevealEnd = event => {
+        if (event.target !== el || event.propertyName !== 'translate') return;
+        finish(el);
+      };
+      revealListeners.set(el, onRevealEnd);
+      el.addEventListener('transitionend', onRevealEnd);
+    });
+  }
+
+  if (!reduceMotion && 'IntersectionObserver' in window) {
+    io = new IntersectionObserver((entries) => {
         const batch = entries.filter(e => e.isIntersecting && !e.target.classList.contains('in'))
           .sort((a, b) => (a.boundingClientRect.top - b.boundingClientRect.top) ||
                           (a.boundingClientRect.left - b.boundingClientRect.left));
         revealStaggered(batch.map(e => e.target));
-        batch.forEach(e => io.unobserve(e.target));
-      }, { threshold: 0.12, rootMargin: '0px 0px -6% 0px' })
-    : null;
+      }, { threshold: 0.16, rootMargin: '0px 0px -18% 0px' });
+  }
 
-  const aboveFold = [], belowFold = [];
-  document.querySelectorAll('.rev').forEach(el =>
-    (el.getBoundingClientRect().top < window.innerHeight * 0.94 ? aboveFold : belowFold).push(el));
-  revealStaggered(aboveFold);
-  belowFold.forEach(el => io ? io.observe(el) : reveal(el));
+  if (!reduceMotion) {
+    const aboveFold = [], belowFold = [];
+    revealElements.forEach(el => {
+      const rect = el.getBoundingClientRect();
+      if (rect.bottom <= 0) { reveal(el); finish(el); }
+      else (rect.top < window.innerHeight * 0.72 ? aboveFold : belowFold).push(el);
+    });
+    requestAnimationFrame(() => requestAnimationFrame(() => revealStaggered(aboveFold)));
+    belowFold.forEach(el => io ? io.observe(el) : reveal(el));
+  }
 
-  // How-we-build: the connector line draws in and the steps light up after it
-  const steps = document.querySelector('.steps');
-  const drawSteps = () => {
-    if (steps.classList.contains('draw')) return;
-    steps.classList.add('draw');
-    setTimeout(() => steps.classList.add('drawn'), 2100);
-  };
-  if (io) {
-    const io2 = new IntersectionObserver(es => {
-      if (es.some(e => e.isIntersecting)) { drawSteps(); io2.disconnect(); }
-    }, { threshold: 0.15, rootMargin: '0px 0px -8% 0px' });
-    io2.observe(steps);
-  } else drawSteps();
-
-  // Failsafe: probe whether IO actually delivers callbacks (some embedded
-  // browsers never do); only force-reveal everything when it is broken, so
-  // real browsers keep their on-scroll animations at any reading pace.
+  // Failsafe for embedded browsers whose IntersectionObserver never reports.
   let ioAlive = !io;
   if (io) {
     const probe = new IntersectionObserver(() => { ioAlive = true; probe.disconnect(); });
     probe.observe(document.body);
+    setTimeout(() => {
+      if (ioAlive) return;
+      document.querySelectorAll('.rev:not(.in)').forEach(el => { reveal(el); finish(el); });
+    }, 1500);
   }
-  setTimeout(() => {
-    if (ioAlive) return;
-    document.querySelectorAll('.rev:not(.in)').forEach(el => { reveal(el); finish(el); });
-    drawSteps();
-  }, 1500);
 
-  // Backstop for browsers whose IO fires initially but not on scroll
-  // (some throttled webviews): sweep up anything the observer missed.
+  // Light fallback sweep for throttled webviews, aligned with the later trigger.
   let lastSweep = 0;
-  window.addEventListener('scroll', () => {
-    const now = performance.now();
-    if (now - lastSweep < 250) return;
-    lastSweep = now;
-    const vh = window.innerHeight * 0.96;
-    const due = [...document.querySelectorAll('.rev:not(.in)')]
-      .filter(el => el.getBoundingClientRect().top < vh);
-    if (due.length) revealStaggered(due);
-    if (!steps.classList.contains('draw') && steps.getBoundingClientRect().top < vh) drawSteps();
-  }, { passive: true });
-
-  // Hero parallax: the torus drifts slightly slower than the page scroll
-  const visual = document.querySelector('.hero .visual');
-  if (visual && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
-    let ticking = false;
-    const drift = () => {
-      ticking = false;
-      const y = window.scrollY;
-      if (y > 1200) return;
-      visual.style.transform = 'translateY(' + Math.min(y * 0.07, 48).toFixed(1) + 'px)';
-    };
+  if (!reduceMotion) {
     window.addEventListener('scroll', () => {
-      if (!ticking) { ticking = true; requestAnimationFrame(drift); }
+      const now = performance.now();
+      if (now - lastSweep < 220) return;
+      lastSweep = now;
+      const trigger = window.innerHeight * 0.84;
+      const due = [...document.querySelectorAll('.rev:not(.in)')]
+        .filter(el => el.getBoundingClientRect().top < trigger);
+      if (due.length) revealStaggered(due);
     }, { passive: true });
+  }
+
+  // True scroll-progress motion lives on dedicated inner layers so reveal,
+  // hover and the torus load animation keep their own transform channels.
+  const clamp = value => Math.max(0, Math.min(1, value));
+  const hero = document.querySelector('.hero');
+  const visualMotion = document.querySelector('.visual-motion');
+  const heroGlow = document.querySelector('.visual-motion .glow');
+  const steps = document.querySelector('.steps');
+  const stepItems = [...document.querySelectorAll('.step')];
+  const phoneDepth = [
+    { panel: document.querySelector('.xpensely'), phone: document.querySelector('.xpensely .phone'), direction: 1 },
+    { panel: document.querySelector('.atelier'), phone: document.querySelector('.atelier .phone'), direction: -1 }
+  ];
+
+  const setStepProgress = (step, progress, distance) => {
+    const eased = 1 - Math.pow(1 - clamp(progress), 3);
+    step.style.setProperty('--step-opacity', eased.toFixed(3));
+    step.style.setProperty('--step-y', ((1 - eased) * distance).toFixed(1) + 'px');
+    step.style.setProperty('--step-scale', (.96 + eased * .04).toFixed(4));
+    step.classList.toggle('active', eased > .58);
+  };
+
+  let motionFrame = 0;
+  const updateScrollMotion = () => {
+    motionFrame = 0;
+    const vh = window.innerHeight;
+    const compact = window.innerWidth <= 900;
+
+    if (hero && visualMotion) {
+      const rect = hero.getBoundingClientRect();
+      const progress = clamp((-rect.top) / Math.max(rect.height * .78, 1));
+      const distance = compact ? 22 : 96;
+      const y = progress * distance;
+      visualMotion.style.setProperty('--hero-y', y.toFixed(1) + 'px');
+      visualMotion.style.setProperty('--hero-r', (progress * (compact ? .9 : 3.2)).toFixed(2) + 'deg');
+      visualMotion.style.setProperty('--hero-scale', (1 - progress * (compact ? .012 : .045)).toFixed(4));
+      if (heroGlow) {
+        heroGlow.style.setProperty('--glow-y', (-y * .24).toFixed(1) + 'px');
+        heroGlow.style.setProperty('--glow-scale', (1 + progress * .12).toFixed(4));
+      }
+    }
+
+    phoneDepth.forEach(({ panel, phone, direction }) => {
+      if (!panel || !phone) return;
+      const rect = panel.getBoundingClientRect();
+      const progress = clamp((vh - rect.top) / Math.max(vh + rect.height, 1));
+      const centered = progress - .5;
+      const travel = compact ? 34 : 72;
+      const rotation = compact ? 2 : 4.5;
+      phone.style.setProperty('--phone-y', (centered * travel).toFixed(1) + 'px');
+      phone.style.setProperty('--phone-r', (centered * rotation * direction).toFixed(2) + 'deg');
+      phone.style.setProperty('--phone-scale', (1 + (.5 - Math.abs(centered)) * (compact ? .018 : .032)).toFixed(4));
+    });
+
+    if (steps) {
+      if (compact) {
+        steps.style.setProperty('--line-progress', '1');
+        const stepsTop = steps.getBoundingClientRect().top;
+        const stepTops = stepItems.map(step => stepsTop + step.offsetTop);
+        stepItems.forEach((step, i) => {
+          const progress = (vh * .9 - stepTops[i]) / Math.max(vh * .28, 1);
+          setStepProgress(step, progress, 28);
+        });
+      } else {
+        const rect = steps.getBoundingClientRect();
+        const progress = clamp((vh * .84 - rect.top) / Math.max(vh * .6, 360));
+        steps.style.setProperty('--line-progress', clamp(progress / .88).toFixed(3));
+        stepItems.forEach((step, i) => setStepProgress(step, (progress - i * .11) / .36, 34));
+      }
+    }
+  };
+
+  const requestMotionUpdate = () => {
+    if (!motionFrame) motionFrame = requestAnimationFrame(updateScrollMotion);
+  };
+
+  if (reduceMotion) {
+    stepItems.forEach(step => step.classList.add('active'));
+  } else {
+    window.addEventListener('scroll', requestMotionUpdate, { passive: true });
+    window.addEventListener('resize', requestMotionUpdate, { passive: true });
+    requestMotionUpdate();
   }
 
   // Signup micro-interaction (mock -- no data is sent anywhere)
