@@ -65,11 +65,11 @@ At its core is **FinBot**, a voice-enabled financial assistant that goes well be
 
 **The vision:** make quality financial advice accessible to everyone.
 
-### Atelier — your wardrobe, reimagined
+### Modiq — your wardrobe, reimagined
 
 An AI-powered fashion platform that helps people get more out of the clothes they already own.
 
-Instead of pushing you to buy more, Atelier curates outfits from your existing wardrobe — then suggests the few pieces genuinely worth adding to complete your style.
+Instead of pushing you to buy more, Modiq curates outfits from your existing wardrobe — then suggests the few pieces genuinely worth adding to complete your style.
 
 - AI outfit curation from your own closet
 - A digital wardrobe you can browse anywhere
