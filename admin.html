@@ -1,0 +1,374 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>Ohris Concepts &middot; Admin</title>
+  <link rel="icon" href="/favicon.ico" />
+  <style>
+    :root{
+      --porcelain:#F3F1F4;
+      --ink:#0E0B14;
+      --card:#FFFFFF;
+      --border:#E4E1E8;
+      --violet:#6E56F7;
+      --violet-soft:#9C8BFF;
+      --muted:rgba(14,11,20,.56);
+      --muted-2:rgba(14,11,20,.4);
+    }
+    *{ box-sizing:border-box; }
+    html,body{ margin:0; }
+    body{
+      background:var(--porcelain);
+      color:var(--ink);
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+      -webkit-font-smoothing:antialiased;
+      line-height:1.45;
+      min-height:100vh;
+    }
+    a{ color:var(--violet); }
+    .wrap{ max-width:1120px; margin:0 auto; padding:32px 20px 64px; }
+
+    /* ---- Login ---- */
+    .gate{ min-height:100vh; display:grid; place-items:center; padding:24px; }
+    .gate-card{
+      width:100%; max-width:380px; background:var(--ink); color:#fff;
+      border-radius:28px; padding:34px 30px; box-shadow:0 30px 80px -30px rgba(14,11,20,.5);
+    }
+    .gate-card h1{ font-size:22px; letter-spacing:-.02em; margin:0 0 6px; }
+    .gate-card p{ margin:0 0 22px; color:rgba(255,255,255,.6); font-size:14px; }
+    .gate-card label{ display:block; font-size:12px; letter-spacing:.04em; text-transform:uppercase; color:rgba(255,255,255,.5); margin-bottom:8px; }
+    .gate-card input{
+      width:100%; padding:13px 15px; border-radius:14px; border:1px solid rgba(255,255,255,.16);
+      background:rgba(255,255,255,.06); color:#fff; font-size:15px; outline:none;
+    }
+    .gate-card input:focus{ border-color:var(--violet-soft); box-shadow:0 0 0 3px rgba(110,86,247,.35); }
+    .gate-card button{
+      width:100%; margin-top:16px; padding:13px 15px; border:0; border-radius:14px;
+      background:var(--violet); color:#fff; font-size:15px; font-weight:600; cursor:pointer;
+      transition:background .15s ease;
+    }
+    .gate-card button:hover{ background:var(--violet-soft); }
+    .gate-card button:disabled{ opacity:.6; cursor:default; }
+    .gate-error{ margin-top:14px; font-size:13px; color:#ff9d9d; min-height:18px; }
+
+    /* ---- Dashboard header ---- */
+    .head{ display:flex; flex-wrap:wrap; gap:16px; align-items:flex-end; justify-content:space-between; margin-bottom:24px; }
+    .head h1{ font-size:26px; letter-spacing:-.025em; margin:0; }
+    .head .sub{ color:var(--muted); font-size:14px; margin-top:4px; }
+    .head-actions{ display:flex; gap:10px; align-items:center; }
+    .btn{
+      border:1px solid var(--border); background:var(--card); color:var(--ink);
+      padding:9px 14px; border-radius:12px; font-size:14px; cursor:pointer; font:inherit;
+    }
+    .btn:hover{ border-color:var(--violet-soft); }
+    .btn.primary{ background:var(--ink); color:#fff; border-color:var(--ink); }
+
+    /* ---- Stats ---- */
+    .stats{ display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:14px; margin-bottom:22px; }
+    .stat{ background:var(--card); border:1px solid var(--border); border-radius:22px; padding:18px 20px; }
+    .stat .n{ font-size:30px; font-weight:700; letter-spacing:-.02em; }
+    .stat .l{ font-size:13px; color:var(--muted); margin-top:2px; }
+
+    .toolbar{ display:flex; gap:12px; align-items:center; margin-bottom:14px; }
+    .search{
+      flex:1; max-width:340px; padding:10px 14px; border-radius:12px; border:1px solid var(--border);
+      background:var(--card); font:inherit; font-size:14px; outline:none;
+    }
+    .search:focus{ border-color:var(--violet-soft); box-shadow:0 0 0 3px rgba(110,86,247,.18); }
+
+    /* ---- Table ---- */
+    .table-card{ background:var(--card); border:1px solid var(--border); border-radius:22px; overflow:hidden; }
+    .table-scroll{ overflow-x:auto; }
+    table{ width:100%; border-collapse:collapse; font-size:14px; }
+    thead th{
+      text-align:left; font-size:12px; letter-spacing:.05em; text-transform:uppercase; color:var(--muted-2);
+      padding:14px 18px; border-bottom:1px solid var(--border); white-space:nowrap; font-weight:600;
+    }
+    tbody td{ padding:14px 18px; border-bottom:1px solid var(--border); vertical-align:top; }
+    tbody tr:last-child td{ border-bottom:0; }
+    tbody tr:hover{ background:rgba(110,86,247,.04); }
+    td.when{ color:var(--muted); white-space:nowrap; }
+    td.email a{ text-decoration:none; }
+    td.email a:hover{ text-decoration:underline; }
+    td.msg{ max-width:360px; color:rgba(14,11,20,.8); }
+    .pill{
+      display:inline-block; padding:3px 10px; border-radius:999px; font-size:12px; font-weight:600;
+      background:rgba(110,86,247,.1); color:var(--violet); white-space:nowrap;
+    }
+    .pill.none{ background:transparent; color:var(--muted-2); font-weight:400; }
+    .dash{ color:var(--muted-2); }
+    .empty{ padding:48px 20px; text-align:center; color:var(--muted); }
+    .foot{ margin-top:16px; font-size:12px; color:var(--muted-2); }
+    [hidden]{ display:none !important; }
+  </style>
+</head>
+<body>
+  <!-- ===== Login gate ===== -->
+  <section class="gate" id="gate">
+    <form class="gate-card" id="gate-form" autocomplete="off">
+      <h1>Ohris admin</h1>
+      <p>Enter the access token to view who has reached out.</p>
+      <label for="token">Access token</label>
+      <input type="password" id="token" name="token" autocomplete="off" spellcheck="false" />
+      <button type="submit" id="gate-submit">Unlock</button>
+      <div class="gate-error" id="gate-error" role="alert" aria-live="polite"></div>
+    </form>
+  </section>
+
+  <!-- ===== Dashboard ===== -->
+  <main class="wrap" id="dash" hidden>
+    <div class="head">
+      <div>
+        <h1>People who reached out</h1>
+        <div class="sub" id="dash-sub">&nbsp;</div>
+      </div>
+      <div class="head-actions">
+        <button class="btn" id="refresh" type="button">Refresh</button>
+        <button class="btn primary" id="signout" type="button">Sign out</button>
+      </div>
+    </div>
+
+    <div class="stats" id="stats"></div>
+
+    <div class="toolbar">
+      <input class="search" id="search" type="search" placeholder="Filter by name, email, or message&hellip;" aria-label="Filter submissions" />
+    </div>
+
+    <div class="table-card">
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>Received</th>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Reaching out as</th>
+              <th>Message</th>
+            </tr>
+          </thead>
+          <tbody id="rows"></tbody>
+        </table>
+      </div>
+      <div class="empty" id="empty" hidden></div>
+    </div>
+    <div class="foot" id="foot"></div>
+  </main>
+
+  <script>
+    const TOKEN_KEY = 'ohris-admin-token';
+    const INTENT_LABELS = {
+      customer: 'Customer',
+      collaborator: 'Collaborator',
+      investor: 'Investor',
+      'future-teammate': 'Future teammate'
+    };
+
+    const gate = document.getElementById('gate');
+    const gateForm = document.getElementById('gate-form');
+    const gateSubmit = document.getElementById('gate-submit');
+    const gateError = document.getElementById('gate-error');
+    const tokenInput = document.getElementById('token');
+    const dash = document.getElementById('dash');
+    const dashSub = document.getElementById('dash-sub');
+    const statsEl = document.getElementById('stats');
+    const rowsEl = document.getElementById('rows');
+    const emptyEl = document.getElementById('empty');
+    const footEl = document.getElementById('foot');
+    const searchEl = document.getElementById('search');
+
+    let allSubmissions = [];
+
+    const getToken = () => sessionStorage.getItem(TOKEN_KEY) || '';
+
+    function showGate(message) {
+      dash.hidden = true;
+      gate.hidden = false;
+      gateError.textContent = message || '';
+      gateSubmit.disabled = false;
+      gateSubmit.textContent = 'Unlock';
+      tokenInput.focus();
+    }
+
+    function showDash() {
+      gate.hidden = true;
+      dash.hidden = false;
+    }
+
+    function fmtDate(value) {
+      const d = new Date(value);
+      if (isNaN(d)) return value || '';
+      return d.toLocaleString(undefined, {
+        year: 'numeric', month: 'short', day: 'numeric',
+        hour: 'numeric', minute: '2-digit'
+      });
+    }
+
+    // Build every cell with textContent so stored names/messages can never
+    // execute as markup in this page.
+    function renderRows(list) {
+      rowsEl.replaceChildren();
+      if (!list.length) {
+        emptyEl.hidden = false;
+        emptyEl.textContent = allSubmissions.length
+          ? 'No submissions match your filter.'
+          : 'No one has reached out yet.';
+        return;
+      }
+      emptyEl.hidden = true;
+
+      const frag = document.createDocumentFragment();
+      for (const s of list) {
+        const tr = document.createElement('tr');
+
+        const when = document.createElement('td');
+        when.className = 'when';
+        when.textContent = fmtDate(s.created_at);
+        tr.appendChild(when);
+
+        const name = document.createElement('td');
+        if (s.name) { name.textContent = s.name; }
+        else { name.innerHTML = '<span class="dash">&mdash;</span>'; }
+        tr.appendChild(name);
+
+        const email = document.createElement('td');
+        email.className = 'email';
+        const a = document.createElement('a');
+        a.href = 'mailto:' + encodeURIComponent(s.email);
+        a.textContent = s.email;
+        email.appendChild(a);
+        tr.appendChild(email);
+
+        const intent = document.createElement('td');
+        const pill = document.createElement('span');
+        if (s.intent && INTENT_LABELS[s.intent]) {
+          pill.className = 'pill';
+          pill.textContent = INTENT_LABELS[s.intent];
+        } else {
+          pill.className = 'pill none';
+          pill.textContent = '—';
+        }
+        intent.appendChild(pill);
+        tr.appendChild(intent);
+
+        const msg = document.createElement('td');
+        msg.className = 'msg';
+        if (s.message) { msg.textContent = s.message; }
+        else { msg.innerHTML = '<span class="dash">&mdash;</span>'; }
+        tr.appendChild(msg);
+
+        frag.appendChild(tr);
+      }
+      rowsEl.appendChild(frag);
+    }
+
+    function renderStats(list) {
+      const total = list.length;
+      const uniqueEmails = new Set(list.map((s) => s.email)).size;
+      const byIntent = {};
+      for (const s of list) {
+        if (s.intent) byIntent[s.intent] = (byIntent[s.intent] || 0) + 1;
+      }
+      const topIntent = Object.entries(byIntent).sort((a, b) => b[1] - a[1])[0];
+
+      const cards = [
+        { n: total, l: 'Total submissions' },
+        { n: uniqueEmails, l: 'Unique people' }
+      ];
+      if (topIntent) {
+        cards.push({ n: topIntent[1], l: 'Top: ' + (INTENT_LABELS[topIntent[0]] || topIntent[0]) });
+      }
+
+      statsEl.replaceChildren();
+      for (const c of cards) {
+        const div = document.createElement('div');
+        div.className = 'stat';
+        const n = document.createElement('div');
+        n.className = 'n';
+        n.textContent = String(c.n);
+        const l = document.createElement('div');
+        l.className = 'l';
+        l.textContent = c.l;
+        div.append(n, l);
+        statsEl.appendChild(div);
+      }
+    }
+
+    function applyFilter() {
+      const q = searchEl.value.trim().toLowerCase();
+      if (!q) { renderRows(allSubmissions); return; }
+      const filtered = allSubmissions.filter((s) =>
+        [s.name, s.email, s.message, s.intent]
+          .filter(Boolean)
+          .some((v) => String(v).toLowerCase().includes(q))
+      );
+      renderRows(filtered);
+    }
+
+    async function load() {
+      const token = getToken();
+      if (!token) { showGate(); return; }
+
+      try {
+        const res = await fetch('/api/submissions', {
+          headers: { Authorization: 'Bearer ' + token }
+        });
+
+        if (res.status === 401) {
+          sessionStorage.removeItem(TOKEN_KEY);
+          showGate('That token was not accepted. Try again.');
+          return;
+        }
+
+        const data = await res.json().catch(() => ({}));
+
+        if (!res.ok) {
+          showDash();
+          dashSub.textContent = data.error || 'Could not load submissions.';
+          statsEl.replaceChildren();
+          rowsEl.replaceChildren();
+          emptyEl.hidden = false;
+          emptyEl.textContent = data.error || 'Could not load submissions.';
+          return;
+        }
+
+        allSubmissions = Array.isArray(data.submissions) ? data.submissions : [];
+        showDash();
+        dashSub.textContent = allSubmissions.length
+          ? 'Newest first.'
+          : 'The form is live — no one has reached out yet.';
+        renderStats(allSubmissions);
+        applyFilter();
+        footEl.textContent = 'Showing ' + allSubmissions.length + ' submission'
+          + (allSubmissions.length === 1 ? '' : 's') + '.';
+      } catch (err) {
+        showDash();
+        dashSub.textContent = 'Network error — could not reach the server.';
+      }
+    }
+
+    gateForm.addEventListener('submit', (ev) => {
+      ev.preventDefault();
+      const token = tokenInput.value.trim();
+      if (!token) { showGate('Enter your access token.'); return; }
+      gateSubmit.disabled = true;
+      gateSubmit.textContent = 'Checking…';
+      sessionStorage.setItem(TOKEN_KEY, token);
+      tokenInput.value = '';
+      load();
+    });
+
+    document.getElementById('refresh').addEventListener('click', load);
+    document.getElementById('signout').addEventListener('click', () => {
+      sessionStorage.removeItem(TOKEN_KEY);
+      allSubmissions = [];
+      showGate();
+    });
+    searchEl.addEventListener('input', applyFilter);
+
+    // Resume an existing session token if one is present.
+    if (getToken()) { load(); } else { showGate(); }
+  </script>
+</body>
+</html>
