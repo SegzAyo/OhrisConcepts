@@ -17,6 +17,24 @@ export function isValidEmail(value) {
   return email.length > 3 && email.length <= 254 && EMAIL_PATTERN.test(email);
 }
 
+export const CONTACT_INTENTS = ["customer", "collaborator", "investor", "future-teammate"];
+const INTENT_SET = new Set(CONTACT_INTENTS);
+export const NAME_MAX_LENGTH = 120;
+export const MESSAGE_MAX_LENGTH = 1000;
+
+// Optional free-text fields are sanitized rather than rejected: a real person is
+// never turned away, and the length cap keeps writes inside the column limits.
+export function normalizeText(value, maxLength) {
+  return typeof value === "string" ? value.trim().slice(0, maxLength) : "";
+}
+
+// Intent must be one of our known values; anything else (drift, tampering, bots)
+// is treated as "not provided" and stored as null.
+export function normalizeIntent(value) {
+  const intent = typeof value === "string" ? value.trim().toLowerCase() : "";
+  return INTENT_SET.has(intent) ? intent : "";
+}
+
 export function parseBodyValue(value) {
   if (value == null || value === "") return {};
   if (Buffer.isBuffer(value)) return JSON.parse(value.toString("utf8"));
@@ -77,12 +95,31 @@ async function ensureSchema(database) {
     schemaPromise = database.query(`
       CREATE TABLE IF NOT EXISTS public.contact_submissions (
         id bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-        email varchar(254) NOT NULL UNIQUE,
+        email varchar(254) NOT NULL,
+        name varchar(120),
+        intent text,
+        message varchar(1000),
         source text NOT NULL DEFAULT 'ohris-concepts',
-        submission_count integer NOT NULL DEFAULT 1 CHECK (submission_count > 0),
-        created_at timestamptz NOT NULL DEFAULT now(),
-        last_submitted_at timestamptz NOT NULL DEFAULT now()
+        created_at timestamptz NOT NULL DEFAULT now()
       );
+
+      ALTER TABLE public.contact_submissions ADD COLUMN IF NOT EXISTS name varchar(120);
+      ALTER TABLE public.contact_submissions ADD COLUMN IF NOT EXISTS intent text;
+      ALTER TABLE public.contact_submissions ADD COLUMN IF NOT EXISTS message varchar(1000);
+
+      -- Move to an append-only model: each submission is its own row, so a
+      -- returning person's new intent or message is never overwritten.
+      ALTER TABLE public.contact_submissions DROP CONSTRAINT IF EXISTS contact_submissions_email_key;
+      CREATE INDEX IF NOT EXISTS contact_submissions_email_idx ON public.contact_submissions (email);
+
+      DO $$
+      BEGIN
+        IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'contact_submissions_intent_check') THEN
+          ALTER TABLE public.contact_submissions
+            ADD CONSTRAINT contact_submissions_intent_check
+            CHECK (intent IS NULL OR intent IN ('customer', 'collaborator', 'investor', 'future-teammate'));
+        END IF;
+      END $$;
 
       ALTER TABLE public.contact_submissions ENABLE ROW LEVEL SECURITY;
       REVOKE ALL ON TABLE public.contact_submissions FROM anon, authenticated;
@@ -136,16 +173,17 @@ export default async function handler(request, response) {
     return sendJson(response, 400, { error: "Enter a valid email address." });
   }
 
+  const name = normalizeText(body.name, NAME_MAX_LENGTH);
+  const intent = normalizeIntent(body.intent);
+  const message = normalizeText(body.message, MESSAGE_MAX_LENGTH);
+
   try {
     const database = getPool();
     await ensureSchema(database);
     await database.query(
-      `INSERT INTO public.contact_submissions (email)
-       VALUES ($1)
-       ON CONFLICT (email) DO UPDATE
-       SET submission_count = contact_submissions.submission_count + 1,
-           last_submitted_at = now()`,
-      [email]
+      `INSERT INTO public.contact_submissions (email, name, intent, message)
+       VALUES ($1, $2, $3, $4)`,
+      [email, name || null, intent || null, message || null]
     );
 
     return sendJson(response, 200, { message: "Thanks — we'll be in touch soon." });
