@@ -103,6 +103,7 @@
 
   @media (prefers-reduced-motion:reduce){
     html.js .rev{ opacity:1; translate:0 0; scale:1; transition:none; will-change:auto; }
+    .signup-more{ transition:none; }
   }
 
   /* =========================================================
@@ -438,12 +439,13 @@
   }
   .join h2{ font-size:clamp(30px, 4.4vw, 52px); letter-spacing:-.03em; font-weight:800; margin:0 0 14px; text-wrap:balance; }
   .join p{ color:rgba(255,255,255,.66); margin:0 auto 32px; max-width:46ch; font-size:17px; line-height:1.6; }
+  .signup-form{ width:min(460px, 90%); margin:0 auto; text-align:left; }
   .signup{
-    display:flex; gap:8px; width:min(460px, 90%); margin:0 auto;
+    display:flex; gap:8px; width:100%;
     background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.16);
     border-radius:999px; padding:7px 7px 7px 20px;
   }
-  .signup input{ flex:1; min-width:0; background:none; border:0; outline:none; color:#fff; font-size:15px; font-family:var(--font-sans); }
+  .signup input[type="email"]{ flex:1; min-width:0; background:none; border:0; outline:none; color:#fff; font-size:15px; font-family:var(--font-sans); }
   .signup input::placeholder{ color:rgba(255,255,255,.5); }
   .signup:focus-within{ outline:2px solid var(--violet-2); outline-offset:3px; }
   .signup button{
@@ -453,6 +455,46 @@
   }
   .signup button:hover{ transform:translateY(-1px); }
   .signup button:disabled{ cursor:wait; opacity:.72; transform:none; }
+  /* Progressive disclosure: extra fields grow in place once someone engages. */
+  .signup-form.expanded .signup button[type="submit"]{ display:none; }
+  .signup-more{
+    display:grid; grid-template-rows:0fr; opacity:0; visibility:hidden;
+    transition:grid-template-rows .42s cubic-bezier(.16,1,.3,1), opacity .32s ease,
+      margin-top .42s ease, visibility .42s;
+  }
+  .signup-form.expanded .signup-more{ grid-template-rows:1fr; opacity:1; visibility:visible; margin-top:14px; }
+  .signup-more-inner{ overflow:hidden; min-height:0; }
+  .signup-more .field{
+    display:block; width:100%; background:rgba(255,255,255,.05);
+    border:1px solid rgba(255,255,255,.14); border-radius:16px; color:#fff;
+    font-size:15px; font-family:var(--font-sans); padding:12px 16px;
+  }
+  .signup-more .field::placeholder{ color:rgba(255,255,255,.5); }
+  .signup-more .field:focus-visible{ outline:2px solid var(--violet-2); outline-offset:2px; }
+  .signup-more textarea.field{ resize:vertical; min-height:52px; margin-top:12px; }
+  .intent{ border:0; padding:0; margin:14px 0 0; min-width:0; }
+  .intent legend{ font-size:12.5px; color:rgba(255,255,255,.55); padding:0; margin:0 0 9px; }
+  .intent .chips{ display:flex; flex-wrap:wrap; gap:8px; }
+  .intent input{
+    position:absolute; width:1px; height:1px; padding:0; margin:-1px;
+    overflow:hidden; clip:rect(0 0 0 0); clip-path:inset(50%); border:0;
+  }
+  .intent label{
+    display:inline-block; cursor:pointer; padding:9px 15px; border-radius:999px;
+    font-size:13.5px; border:1px solid rgba(255,255,255,.16);
+    background:rgba(255,255,255,.05); color:rgba(255,255,255,.8);
+    transition:border-color .18s, color .18s, background .18s;
+  }
+  .intent label:hover{ border-color:var(--violet-2); color:#fff; }
+  .intent input:checked + label{ background:var(--violet); border-color:transparent; color:#fff; }
+  .intent input:focus-visible + label{ outline:2px solid var(--violet-2); outline-offset:2px; }
+  .signup-more .submit-full{
+    width:100%; margin-top:16px; background:var(--violet); color:#fff; border:0;
+    font-weight:650; font-size:15px; padding:13px; border-radius:16px; cursor:pointer;
+    font-family:var(--font-sans); transition:transform .18s, background .18s;
+  }
+  .signup-more .submit-full:hover{ transform:translateY(-1px); background:var(--violet-deep); }
+  .signup-more .submit-full:disabled{ cursor:wait; opacity:.72; transform:none; }
   .website-field{
     position:absolute; width:1px; height:1px; overflow:hidden;
     clip:rect(0 0 0 0); clip-path:inset(50%); white-space:nowrap;
@@ -788,12 +830,34 @@
   <section class="join" id="join">
     <h2 class="rev">Join our journey.</h2>
     <p class="rev">We're just getting started. Customer, collaborator, investor or future teammate &mdash; we'd love to have you along.</p>
-    <form class="signup rev" id="signup" aria-label="Get in touch">
-      <input type="email" name="email" required maxlength="254" autocomplete="email" inputmode="email" placeholder="you@company.com" aria-label="Email address" />
-      <label class="website-field" aria-hidden="true" hidden>Website<input type="text" name="website" tabindex="-1" autocomplete="off" /></label>
-      <button type="submit">Get in touch</button>
+    <form class="signup-form rev" id="signup" aria-label="Get in touch">
+      <div class="signup">
+        <input type="email" name="email" required maxlength="254" autocomplete="email" inputmode="email" placeholder="you@company.com" aria-label="Email address" />
+        <label class="website-field" aria-hidden="true" hidden>Website<input type="text" name="website" tabindex="-1" autocomplete="off" /></label>
+        <button type="submit">Get in touch</button>
+      </div>
+      <div class="signup-more" id="signup-more">
+        <div class="signup-more-inner">
+          <input class="field" type="text" name="name" maxlength="120" autocomplete="name" placeholder="Your name" aria-label="Your name" />
+          <fieldset class="intent">
+            <legend>I'm reaching out as&hellip;</legend>
+            <div class="chips">
+              <input type="radio" id="intent-customer" name="intent" value="customer" />
+              <label for="intent-customer">Customer</label>
+              <input type="radio" id="intent-collaborator" name="intent" value="collaborator" />
+              <label for="intent-collaborator">Collaborator</label>
+              <input type="radio" id="intent-investor" name="intent" value="investor" />
+              <label for="intent-investor">Investor</label>
+              <input type="radio" id="intent-teammate" name="intent" value="future-teammate" />
+              <label for="intent-teammate">Future teammate</label>
+            </div>
+          </fieldset>
+          <textarea class="field" name="message" maxlength="1000" rows="2" placeholder="Anything you'd like us to know? (optional)" aria-label="Message (optional)"></textarea>
+          <button type="submit" class="submit-full">Get in touch</button>
+        </div>
+      </div>
     </form>
-    <div class="ok" role="status" aria-live="polite"></div>
+    <div class="ok" role="status" aria-live="polite" tabindex="-1"></div>
     <div class="contact-emails rev" aria-label="Contact email addresses">
       <a href="mailto:admin@ohrisconcepts.com">admin@ohrisconcepts.com</a>
       <a href="mailto:sales@ohrisconcepts.com">sales@ohrisconcepts.com</a>
@@ -1003,17 +1067,28 @@
   // read only by that function and is never exposed to this browser code.
   const signupForm = document.getElementById('signup');
   const signupStatus = document.querySelector('#join .ok');
-  const signupButton = signupForm.querySelector('button');
-  const defaultButtonLabel = signupButton.textContent;
+  const signupEmail = signupForm.querySelector('input[name="email"]');
+  const signupButtons = Array.from(signupForm.querySelectorAll('button[type="submit"]'));
+  const pillButton = signupForm.querySelector('.signup button[type="submit"]');
+  const fullButton = signupForm.querySelector('.submit-full');
+
+  // Reveal the name / intent / message fields once someone engages with email.
+  const expandSignup = () => signupForm.classList.add('expanded');
+  signupEmail.addEventListener('focus', expandSignup);
+  signupEmail.addEventListener('input', expandSignup);
 
   signupForm.addEventListener('submit', async (ev) => {
     ev.preventDefault();
+    // Relabel whichever submit button is actually visible in the current state.
+    // ev.submitter can report the hidden pill button on Enter-key submits.
+    const trigger = signupForm.classList.contains('expanded') ? fullButton : pillButton;
+    const triggerLabel = trigger.textContent;
     const formData = new FormData(signupForm);
 
     signupStatus.classList.remove('error');
     signupStatus.textContent = 'Sending\u2026';
-    signupButton.disabled = true;
-    signupButton.textContent = 'Sending\u2026';
+    signupButtons.forEach((button) => { button.disabled = true; });
+    trigger.textContent = 'Sending\u2026';
 
     try {
       const response = await fetch('/api/contact', {
@@ -1021,6 +1096,9 @@
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           email: formData.get('email'),
+          name: formData.get('name'),
+          intent: formData.get('intent'),
+          message: formData.get('message'),
           website: formData.get('website')
         })
       });
@@ -1031,14 +1109,17 @@
       }
 
       signupForm.reset();
+      signupForm.classList.remove('expanded');
       signupStatus.textContent = result.message || 'Thanks \u2014 we\'ll be in touch soon.';
-      signupButton.textContent = 'Sent';
     } catch (error) {
       signupStatus.classList.add('error');
       signupStatus.textContent = error.message || 'We could not send that right now. Please try again.';
-      signupButton.textContent = defaultButtonLabel;
     } finally {
-      signupButton.disabled = false;
+      signupButtons.forEach((button) => { button.disabled = false; });
+      trigger.textContent = triggerLabel;
+      // Disabling/collapsing drops focus to <body>; land it on the announced
+      // status instead so keyboard and screen-reader users aren't ejected.
+      signupStatus.focus();
     }
   });
 </script>
