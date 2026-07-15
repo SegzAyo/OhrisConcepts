@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "check": "node --check api/contact.js && node --test",
+    "check": "node --check api/_db.js && node --check api/contact.js && node --check api/submissions.js && node --test",
     "test": "node --test"
   },
   "engines": {
